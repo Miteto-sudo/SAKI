@@ -23,29 +23,29 @@ CUDA_VISIBLE_DEVICES="" python -X faulthandler examples/toy_rollout.py
 
 ## Method semantics
 
-At each prefix, the frozen student proposes a token from \(p\). The teacher and student define the full-vocabulary geometric bridge
+At each prefix, the frozen student proposes a token from $p$. The teacher and student define the full-vocabulary geometric bridge
 
-\[
+$$
 q_\beta(v) \propto p(v)^{1-\beta}T(v)^\beta,
 \qquad D_{\mathrm{KL}}(q_\beta\|p) \leq \epsilon.
-\]
+$$
 
-Maximal coupling retains a proposal \(z\) with probability
+Maximal coupling retains a proposal $z$ with probability
 
-\[
+$$
 \min\left(1, \frac{q(z)}{p(z)}\right).
-\]
+$$
 
-If the proposal is rejected, the rollout token is sampled from the positive residual \([q-p]_+\). Verification commits the accepted prefix plus the first residual correction and invalidates the speculative suffix. The correction token changes the subsequent rollout prefix, but it is not the direct supervision target.
+If the proposal is rejected, the rollout token is sampled from the positive residual $[q-p]_+$. Verification commits the accepted prefix plus the first residual correction and invalidates the speculative suffix. The correction token changes the subsequent rollout prefix, but it is not the direct supervision target.
 
 The realized coupling event routes training:
 
 - accepted position: sampled-token K1/RKL policy-gradient surrogate;
-- correction position: the K1 contribution is exactly zero and is replaced by teacher-mode NLL, \(-\log \pi_\theta(\arg\max_v T(v))\);
+- correction position: the K1 contribution is exactly zero and is replaced by teacher-mode NLL, $-\log \pi_\theta(\arg\max_v T(v))$;
 - the correction coefficient is 1.0;
 - both branches are summed and jointly normalized by the total number of valid response tokens.
 
-The exact \(\epsilon=0\) endpoint returns \(\beta=0\), \(q=p\), and zero corrections.
+The exact $\epsilon=0$ endpoint returns $\beta=0$, $q=p$, and zero corrections.
 
 ## Training implementation
 
