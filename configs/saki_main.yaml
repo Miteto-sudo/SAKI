@@ -1,0 +1,34 @@
+# Reference SAKI configuration used for the reported experiments.
+# Accepted-token K1/RKL signals are optimized with the training framework's
+# one-epoch clipped importance-ratio surrogate.
+method:
+  rollout_mode: coupling_q
+  block_size: 8
+  epsilon_schedule:
+    type: linear
+    start_step: 1
+    end_step: 51
+    start_epsilon: 0.02
+    end_epsilon: 0.0
+  correction_position_selector: actual
+  correction_objective: teacher_mode_top1
+  replace_k1_on_correction: true
+  correction_coefficient: 1.0
+  normalization: valid_response_tokens
+
+optimizer_semantics:
+  k1_estimator: sampled_token_log_ratio
+  use_detached_policy_gradient: true
+  ppo_epochs: 1
+  clip_ratio: 0.2
+  dual_clip_ratio: 3.0
+  k1_value_clamp: 10.0
+
+training_protocol:
+  total_steps: 200
+  learning_rate: 1.0e-6
+  prompts_per_batch: 64
+  responses_per_prompt: 8
+  temperature: 1.0
+  top_p: 1.0
+  speculative_k: 8
